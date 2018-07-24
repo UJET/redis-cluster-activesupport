@@ -1,34 +1,41 @@
-# Redis cluster stores for ActiveSupport [![Build Status](https://travis-ci.org/film42/redis-cluster-activesupport.svg?branch=master)](https://travis-ci.org/film42/redis-cluster-activesupport)
+# Redis Elasticache stores for ActiveSupport [![Build Status](https://travis-ci.org/film42/redis-cluster-activesupport.svg?branch=master)](https://travis-ci.org/film42/redis-cluster-activesupport)
 
 This gem is an extension to [redis-activesupport](https://github.com/redis-store/redis-activesupport) that adds support
-for a few features required to use `redis-store` with redis cluster. Right now there isn't an official redis cluster
-client in ruby, so it's become common to use a redis cluster proxy like [corvus](https://github.com/eleme/corvus). When
-switching there are a few things you can't do with redis cluster that you can do with a single redis server. Most of
-them revolve around issuing commands with multiple keys. In redis cluster, your keys are partitioned and live on
-different physical servers, operations like `KEYS` are not possible. Corvus will break apart `MSET` and `MGET` into
-individual `GET` and `SET` commands automatically, but in general, it's not a good idea to use them.
+for failover of an Elasticache Redis cluster. The project owes its existence to 
+[redis-cluster-activesupport](https://github.com/film42/redis-cluster-activesupport) that I found in a discussion about 
+handling the `LOADING Redis is loading the dataset in memory` which is a message you will see when a replica is promoted 
+to primary.
 
 ## Usage
 
 This gem is a small extension to `redis-activesupport`, so refer to their documentation for most configuration. Instead
-of specifying `:redis_store` you must now specify `:redis_cluster_store` to load this extension.
+of specifying `:redis_store` you must now specify `:redis_elasticache_store` to load this extension.
 
 ```ruby
 module MyProject
   class Application < Rails::Application
-    config.cache_store = :redis_cluster_store, options
+    config.cache_store = :redis_elasticache_store, options
   end
 end
 ```
 
-Additionally, there's a new configuration option: `:ignored_command_errors`. This is useful if you're using a redis
-cluster proxy like corvus who will raise a `Redis::CommandError` with a message indicating the cluster is offline or
-experiencing a partial outage. This extension allows you to whitelist certain `ignored_command_errors` that would
+Additionally, there's a new configuration option: `:ignored_command_errors`. This is useful if you're using a Redis
+Elasticache with automatic failover which will cause a `Redis::CommandError` with a message indicating the cluster is 
+in READONLY mode. This extension allows you to whitelist certain `ignored_command_errors` that would
 normally be raised by `redis-activesupport`. By default this gem whitelists the following errors:
 
 ```ruby
-DEFAULT_IGNORED_COMMAND_ERRORS = ["ERR Proxy error"]
+DEFAULT_IGNORED_COMMAND_ERRORS = [
+  "READONLY You can't write against a read only slave.",
+  'LOADING Redis is loading the dataset in memory',
+  'A write operation was issued to an ELASTICACHE slave node.'
+]
 ```
+
+* You get `LOADING Redis is loading the dataset in memory` when a replica becomes a primary.
+* You get `READONLY You can't write against a read only slave.` if a failover has occured and you are talking to the new replica.
+* You get `A write operation was issued to an ELASTICACHE slave node.` if you are using 
+[redis-elasticache](https://github.com/craigmcnamara/redis-elasticache) to override the REAONLY error.
 
 If you need additional errors added to the whitelist, you can do this through your own configuration or open a pull
 request to add it to the default whitelist. NOTE: this list is turned into a `Set` to keep lookups fast, so feel free to
@@ -37,13 +44,13 @@ make this list as big as you need. Example:
 ```ruby
 module MyProject
   class Application < Rails::Application
-    config.cache_store = :redis_cluster_store, {:ignored_command_errors => ["Uh oh", "Please, stop", "Fire emoji"]}
+    config.cache_store = :redis_elasticache_store, {:ignored_command_errors => ["Uh oh", "Please, stop", "Fire emoji"]}
   end
 end
 ```
 
-With this change, your cache store will now silently fail once again so a redis cluster won't knock your rails apps
-offline.
+With this change, your cache store will now silently fail if your Elasticache Redis experiences a failover event 
+ which means you won't knock your rails apps offline.
 
 
 ## Installation
@@ -51,7 +58,7 @@ offline.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem "redis-cluster-activesupport"
+gem "redis-elasticache-activesupport"
 ```
 
 And then execute:
@@ -60,11 +67,11 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install redis-cluster-activesupport
+    $ gem install redis-elasticache-activesupport
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/film42/redis-cluster-activesupport.
+Bug reports and pull requests are welcome on GitHub at https://github.com/UJET/redis-elasticache-activesupport.
 
 ## License
 
