@@ -1,4 +1,4 @@
-# Redis Elasticache stores for ActiveSupport [![Build Status](https://travis-ci.org/film42/redis-cluster-activesupport.svg?branch=master)](https://travis-ci.org/film42/redis-cluster-activesupport)
+# Redis Elasticache stores for ActiveSupport [![Build Status](https://travis-ci.org/UJET/redis-elasticache-activesupport.svg?branch=master)](https://travis-ci.org/UJET/redis-elasticache-activesupport)
 
 This gem is an extension to [redis-activesupport](https://github.com/redis-store/redis-activesupport) that adds support
 for failover of an Elasticache Redis cluster. The project owes its existence to 
