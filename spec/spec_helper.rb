@@ -1,6 +1,6 @@
 require "bundler/setup"
 require "pry"
-require "redis/cluster/activesupport"
+require "redis/elasticache/activesupport"
 require "fakeredis/rspec"
 
 RSpec.configure do |config|
