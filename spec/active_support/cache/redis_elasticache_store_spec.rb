@@ -13,7 +13,7 @@ describe ::ActiveSupport::Cache::RedisElasticacheStore do
         ::Redis::CommandError,
         'LOADING Redis is loading the dataset in memory'
       )
-      expect(subject.delete_matched('test')).to eq(nil)
+      expect(subject.delete_matched('test')).to eq(false)
     end
 
     it 'raises when an unknown command error occurs' do
@@ -32,7 +32,7 @@ describe ::ActiveSupport::Cache::RedisElasticacheStore do
           ::Redis::CommandError,
           'Faked You Out'
         )
-        expect(subject.delete_matched('test')).to eq(nil)
+        expect(subject.delete_matched('test')).to eq(false)
       end
     end
 
@@ -57,7 +57,7 @@ describe ::ActiveSupport::Cache::RedisElasticacheStore do
         ::Redis::CommandError,
         'LOADING Redis is loading the dataset in memory'
       )
-      expect(subject.fetch_multi('test')).to eq(nil)
+      expect(subject.fetch_multi('test')).to eq(false)
     end
 
     it 'raises when an unknown command error occurs' do
@@ -76,7 +76,7 @@ describe ::ActiveSupport::Cache::RedisElasticacheStore do
           ::Redis::CommandError,
           'Faked You Out'
         )
-        expect(subject.fetch_multi('test')).to eq(nil)
+        expect(subject.fetch_multi('test')).to eq(false)
       end
     end
 
@@ -104,16 +104,9 @@ describe ::ActiveSupport::Cache::RedisElasticacheStore do
       expect(subject.increment('testing', 5, expires_in: 5.minutes)).to eq(6)
     end
 
-    it 'can increment without a ttl' do
+    it 'can increment' do
       expect(fake_client).to_not receive(:pipelined).and_call_original
       expect(subject.increment('testing')).to eq(1)
-    end
-
-    it 'can increment with a ttl' do
-      expect(fake_client).to receive(:pipelined).and_yield
-      expect(fake_client).to receive(:incrby).with('testing', 1)
-      expect(fake_client).to receive(:expire).with('testing', 300)
-      subject.increment('testing', 1, expires_in: 5.minutes)
     end
   end
 
