@@ -9,7 +9,8 @@ module ActiveSupport
       DEFAULT_IGNORED_COMMAND_ERRORS = [
         "READONLY You can't write against a read only slave.",
         'LOADING Redis is loading the dataset in memory',
-        'A write operation was issued to an ELASTICACHE slave node.'
+        'A write operation was issued to an ELASTICACHE slave node.',
+        'A write operation was issued to an ELASTICACHE slave node that is READONLY.'
       ].freeze
 
       def initialize(*)
