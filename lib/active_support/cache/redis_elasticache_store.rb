@@ -10,7 +10,8 @@ module ActiveSupport
         "READONLY You can't write against a read only slave.",
         'LOADING Redis is loading the dataset in memory',
         'A write operation was issued to an ELASTICACHE slave node.',
-        'A write operation was issued to an ELASTICACHE slave node that is READONLY.'
+        'A write operation was issued to an ELASTICACHE slave node that is READONLY.',
+        'A write operation was issued to an ELASTICACHE node that was previously READONLY and is now LOADING.'
       ].freeze
 
       def initialize(*)
