@@ -28,7 +28,9 @@ normally be raised by `redis-activesupport`. By default this gem whitelists the 
 DEFAULT_IGNORED_COMMAND_ERRORS = [
   "READONLY You can't write against a read only slave.",
   'LOADING Redis is loading the dataset in memory',
-  'A write operation was issued to an ELASTICACHE slave node.'
+  'A write operation was issued to an ELASTICACHE slave node.',
+  'A write operation was issued to an ELASTICACHE slave node that is READONLY.',
+  'A write operation was issued to an ELASTICACHE node that was previously READONLY and is now LOADING.'
 ]
 ```
 
@@ -36,6 +38,7 @@ DEFAULT_IGNORED_COMMAND_ERRORS = [
 * You get `READONLY You can't write against a read only slave.` if a failover has occured and you are talking to the new replica.
 * You get `A write operation was issued to an ELASTICACHE slave node.` if you are using 
 [redis-elasticache](https://github.com/craigmcnamara/redis-elasticache) to override the REAONLY error.
+* You get the last two statements if you use [redis-elasticache](https://github.com/craigmcnamara/redis-elasticache) and this PR is accepted https://github.com/craigmcnamara/redis-elasticache/pull/6.
 
 If you need additional errors added to the whitelist, you can do this through your own configuration or open a pull
 request to add it to the default whitelist. NOTE: this list is turned into a `Set` to keep lookups fast, so feel free to
@@ -58,7 +61,7 @@ With this change, your cache store will now silently fail if your Elasticache Re
 Add this line to your application's Gemfile:
 
 ```ruby
-gem "redis-elasticache-activesupport"
+gem 'redis-elasticache-activesupport'
 ```
 
 And then execute:
