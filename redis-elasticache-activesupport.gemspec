@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.name          = 'redis-elasticache-activesupport'
   spec.version       = '0.1.2'
   spec.authors       = ['Nate Faerber']
-  spec.email         = ['nate@ujet.com']
+  spec.email         = ['nate@ujet.cx']
 
   spec.summary       = 'Extension to redis-activesupport for working with ' \
                        'redis elasticache'
